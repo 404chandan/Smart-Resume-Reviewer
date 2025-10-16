@@ -126,10 +126,10 @@ function LandingPage() {
 </motion.div>
 
 
-      {/* Footer */}
-      <footer className="bg-gray-100 text-center py-6 text-gray-600">
+      
+      {/* <footer className="bg-gray-100 text-center py-6 text-gray-600">
         Built with ❤️ by <span className="font-semibold text-gray-800">Smart Resume Reviewer</span> © {new Date().getFullYear()}
-      </footer>
+      </footer> */}
     </div>
   );
 }
@@ -163,7 +163,11 @@ export default function App() {
             <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
           </Routes>
         </main>
+
       </div>
+      <footer className="bg-gray-100 text-center py-6 text-gray-600">
+        Built with ❤️ by <span className="font-semibold text-gray-800">Chandan Pandey</span> © {new Date().getFullYear()}
+      </footer>
     </BrowserRouter>
   );
 }
