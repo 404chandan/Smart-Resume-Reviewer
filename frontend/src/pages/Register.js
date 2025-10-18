@@ -15,9 +15,10 @@ export default function Register() {
     try {
       const res = await API.post("/auth/register", { name, email, password });
       setUser(res.data.user);
+      alert("✅ Registration successful!");
       nav("/upload");
     } catch (err) {
-      alert(err.response?.data?.message || "Register failed");
+      alert(err.response?.data?.message || "Registration failed");
     }
   }
 
@@ -25,11 +26,34 @@ export default function Register() {
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
       <h2 className="text-xl font-semibold mb-4 text-center">Register</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input className="p-2 border rounded" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} />
-        <input className="p-2 border rounded" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" className="p-2 border rounded" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button className="bg-green-600 text-white p-2 rounded">Register</button>
-        <p className="text-center text-sm mt-2">Already have an account? <Link className="text-blue-600" to="/login">Login</Link></p>
+        <input
+          className="p-2 border rounded"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          className="p-2 border rounded"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          className="p-2 border rounded"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          Register
+        </button>
+        <p className="text-center text-sm mt-2">
+          Already have an account?{" "}
+          <Link className="text-blue-600" to="/login">
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );

@@ -1,49 +1,52 @@
-const fs = require('fs');
-const pdfParse = require('pdf-parse');
-const { PDFDocument } = require('pdf-lib');
+const fs = require("fs");
+const pdfParse = require("pdf-parse");
+const PDFParser = require("pdf2json");
 
 /**
- * Extract text safely from PDFs.
- * - Tries pdf-parse first.
- * - Falls back to pdf-lib if XRef error occurs.
+ * Extract text from a PDF file with multiple fallback strategies.
  */
 async function extractText(filePath) {
+  // 1️⃣ Try pdf-parse first
   try {
-    const buffer = fs.readFileSync(filePath);
     console.log("📄 Extracting text locally using pdf-parse...");
-
-    const data = await pdfParse(buffer);
-    if (!data.text || data.text.trim().length === 0) {
-      throw new Error("Empty text content");
+    const dataBuffer = fs.readFileSync(filePath);
+    const data = await pdfParse(dataBuffer);
+    if (data.text && data.text.trim().length > 0) {
+      console.log("✅ Successfully extracted text using pdf-parse.");
+      return data.text;
     }
-
-    console.log("✅ Resume text extracted successfully via pdf-parse.");
-    return data.text.trim();
   } catch (err) {
-    console.warn("❌ PDF text extraction failed:", err.message);
-
-    try {
-      console.log("⚙️ Retrying extraction using pdf-lib fallback...");
-      const buffer = fs.readFileSync(filePath);
-      const pdfDoc = await PDFDocument.load(buffer);
-      let textContent = "";
-
-      const pages = pdfDoc.getPages();
-      for (const page of pages) {
-        textContent += page.getTextContent ? await page.getTextContent() : "";
-      }
-
-      if (!textContent || textContent.trim().length === 0) {
-        throw new Error("pdf-lib also failed to extract text");
-      }
-
-      console.log("✅ Text extracted successfully via pdf-lib fallback.");
-      return textContent.trim();
-    } catch (fallbackErr) {
-      console.error("❌ Fallback also failed:", fallbackErr.message);
-      throw new Error("Failed to extract text from PDF.");
-    }
+    console.error("❌ pdf-parse failed:", err.message);
   }
+
+  // 2️⃣ Try pdf2json as fallback
+  try {
+    console.log("⚙️ Retrying extraction using pdf2json...");
+    const pdfParser = new PDFParser();
+
+    const text = await new Promise((resolve, reject) => {
+      pdfParser.on("pdfParser_dataError", (errData) => reject(errData.parserError));
+      pdfParser.on("pdfParser_dataReady", (pdfData) => {
+        // Extract all text items
+        const rawText = pdfData.Pages.map(page =>
+          page.Texts.map(t => decodeURIComponent(t.R[0].T)).join(" ")
+        ).join("\n");
+        resolve(rawText);
+      });
+
+      pdfParser.loadPDF(filePath);
+    });
+
+    if (text && text.trim().length > 0) {
+      console.log("✅ Successfully extracted text using pdf2json.");
+      return text;
+    }
+  } catch (err) {
+    console.error("❌ pdf2json failed:", err.message);
+  }
+
+  // 3️⃣ Final fallback: graceful failure
+  throw new Error("Failed to extract text from PDF.");
 }
 
 module.exports = { extractText };

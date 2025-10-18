@@ -14,6 +14,7 @@ export default function Login() {
     try {
       const res = await API.post("/auth/login", { email, password });
       setUser(res.data.user);
+      alert("✅ Login successful!");
       nav("/upload");
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
@@ -24,10 +25,28 @@ export default function Login() {
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
       <h2 className="text-xl font-semibold mb-4 text-center">Login</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input className="p-2 border rounded" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" className="p-2 border rounded" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button className="bg-blue-600 text-white p-2 rounded">Login</button>
-        <p className="text-center text-sm mt-2">No account? <Link className="text-blue-600" to="/register">Register</Link></p>
+        <input
+          className="p-2 border rounded"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          className="p-2 border rounded"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          Login
+        </button>
+        <p className="text-center text-sm mt-2">
+          No account?{" "}
+          <Link className="text-blue-600" to="/register">
+            Register
+          </Link>
+        </p>
       </form>
     </div>
   );
