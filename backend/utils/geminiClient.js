@@ -32,7 +32,7 @@ Now analyze and respond ONLY in valid JSON format, with this structure:
 }
 `;
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
   async function callGemini(attempt = 1) {
     try {
