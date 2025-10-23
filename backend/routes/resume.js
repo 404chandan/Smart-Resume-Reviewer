@@ -35,19 +35,9 @@ router.post("/upload", authMiddleware, upload.single("resume"), async (req, res)
     if (!req.file) return res.status(400).json({ message: "No resume uploaded" });
 
     const { jobDescription, jobRole } = req.body;
-    console.log("📄 Extracting text locally using pdf-parse...");
-
     const text = await extractText(req.file.path);
-    console.log("✅ Resume text extracted successfully.");
+    const feedback = await analyzeResume({ resumeText: text, jobDescription, jobRole });
 
-    console.log("🤖 Sending resume text to Gemini...");
-    const feedback = await analyzeResume({
-      resumeText: text,
-      jobDescription,
-      jobRole,
-    });
-
-    // 💾 Save in database
     const newFeedback = await ResumeFeedback.create({
       userId: req.user._id,
       resumeFile: req.file.filename,
@@ -58,10 +48,7 @@ router.post("/upload", authMiddleware, upload.single("resume"), async (req, res)
       suggestions: feedback.suggestions,
     });
 
-    res.json({
-      message: "Analysis complete",
-      feedback: newFeedback,
-    });
+    res.json({ message: "Analysis complete", feedback: newFeedback });
   } catch (err) {
     console.error("❌ Error analyzing resume:", err.message);
     res.status(500).json({ message: "Failed to analyze resume", error: err.message });
@@ -76,6 +63,18 @@ router.get("/history", authMiddleware, async (req, res) => {
   } catch (err) {
     console.error("History fetch error:", err);
     res.status(500).json({ message: "Failed to fetch history" });
+  }
+});
+
+// 🧾 Get Resume Feedback by ID
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const feedback = await ResumeFeedback.findById(req.params.id);
+    if (!feedback) return res.status(404).json({ message: "Resume not found" });
+    res.json({ item: feedback });
+  } catch (err) {
+    console.error("Error fetching resume:", err);
+    res.status(500).json({ message: "Failed to fetch resume", error: err.message });
   }
 });
 
