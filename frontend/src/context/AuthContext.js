@@ -7,10 +7,11 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 🧠 Fetch current logged-in user on mount
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await API.get("/auth/me");
+        const res = await API.get("/auth/me", { withCredentials: true }); // ✅ include cookies
         setUser(res.data.user);
       } catch {
         setUser(null);
@@ -21,14 +22,19 @@ export function AuthProvider({ children }) {
     fetchUser();
   }, []);
 
+  // 🚪 Logout function
   const logout = async () => {
-    await API.post("/auth/logout");
-    setUser(null);
+    try {
+      await API.post("/auth/logout", {}, { withCredentials: true }); // ✅ send cookie for logout
+      setUser(null);
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading, logout }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
