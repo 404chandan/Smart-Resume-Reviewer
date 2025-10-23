@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaUpload, FaRobot, FaHistory } from "react-icons/fa";
+import { FaUpload, FaRobot, FaHistory } from "react-icons/fa"; // for react icons 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UploadPage from "./pages/UploadPage";
@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthContext } from "./context/AuthContext";
 import API from "./api";
 
+// Function for navigation
 function Navbar() {
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
